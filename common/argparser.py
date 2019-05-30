@@ -3,6 +3,9 @@ import argparse
 
 parser = argparse.ArgumentParser()
 
+# for jupyter-notebook
+parser.add_argument('-f', type=str)
+
 # gpu device
 parser.add_argument('-gpu', type=str, default='-1')
 
@@ -27,9 +30,8 @@ parser.add_argument('-optimizer', type=str, default='adam',
                     help='adam/adagrad/gd/rms/momentum')
 
 # path setting
-parser.add_argument('-data', type=int, default=10)
-parser.add_argument('-n_edges', type=int, default=45)
-parser.add_argument('-n_actions', type=int, default=10)
+parser.add_argument('-train_path', type=str, default='../DataSet/TrainSet.csv')
+parser.add_argument('-test_path', type=str, default='../DataSet/TestSet.csv')
 
 args = parser.parse_args()
 

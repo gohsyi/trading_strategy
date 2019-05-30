@@ -1,6 +1,7 @@
 import numpy as np
 
 from baselines.a2c.utils import discount_with_dones
+from baselines.common.runners import AbstractEnvRunner
 
 
 class Runner(object):
@@ -13,97 +14,59 @@ class Runner(object):
     run():
     - Make a mini batch of experiences
     """
-
-    def __init__(self, env, d_model, a_model, nsteps=5, gamma=0.99):
+    def __init__(self, env, model, batchsize=128, gamma=0.99):
         self.env = env
-        self.d_model = d_model
-        self.a_model = a_model
-        self.obs = env.reset()
-        self.nsteps = nsteps
-        self.dones = [False]
-
+        self.model = model
+        self.batchsize = batchsize
         self.gamma = gamma
+        
+        # pre-set
+        self.obs = env.reset()
+        self.done = False
 
     def run(self):
-        """
-        Make a mini batch of experiences
-        :return:
-            mb_obs: (batch_size x ob_size), observations of both defender and attacker
-            (mb_d_rewards, mb_a_rewards): (batch_size x 1, batch_size x 1), rewards of attacker
-            (mb_d_actions, mb_a_actions): (batch_size x 1, batch_size x 1), actions of attacker
-            (mb_d_values, mb_a_values): (batch_size x 1, batch_size x 1), estimated value of attacker
-            epinfos: other infos (useless for now)
-        """
-
         # We initialize the lists that will contain the mb of experiences
-        mb_obs, mb_d_rewards, mb_dones = [],[],[]
-        mb_d_actions, mb_a_actions, mb_d_values, mb_a_values = [],[],[],[]
-        epinfos = []
-        for n in range(self.nsteps):
+        mb_obs, mb_rewards, mb_actions, mb_values, mb_dones = [],[],[],[],[]
+        
+        for n in range(self.batchsize):
             # Given observations, take action and value (V(s))
             # We already have self.obs because Runner superclass run self.obs[:] = env.reset() on init
-            d_actions, d_values = self.d_model.step(self.obs)
-            a_actions, a_values = self.a_model.step(self.obs)
-            d_actions = np.squeeze(d_actions)
-            a_actions = np.squeeze(a_actions)
-            d_values = np.squeeze(d_values)
-            a_values = np.squeeze(a_values)
+            action, value = self.model.step(self.obs)
 
             # Append the experiences
-            mb_obs.append(np.copy(self.obs))
-            mb_d_actions.append(d_actions)
-            mb_a_actions.append(a_actions)
-            mb_d_values.append(d_values)
-            mb_a_values.append(a_values)
-            mb_dones.append(self.dones)
+            mb_obs.append(self.obs)
+            mb_actions.append(action)
+            mb_values.append(value)
+            mb_dones.append(self.done)
 
             # Take actions in env and look the results
-            actions = (d_actions, a_actions)
-            obs, rewards, dones, infos = self.env.step(actions)
-            self.dones = dones
+            obs, reward, done, _ = self.env.step(actions)
+            self.done = done
             self.obs = obs
-            mb_d_rewards.append(rewards)
-
-        mb_dones.append(self.dones)
+            mb_dones.append(done)
+            mb_rewards.append(rewards)
+            
+        mb_dones.append(self.done)
 
         # Batch of steps to batch of rollouts
-        mb_obs = np.asarray(mb_obs, dtype=np.float32)
-        mb_d_rewards = np.asarray(mb_d_rewards, dtype=np.float32)
-        mb_a_rewards = -mb_d_rewards
-        mb_d_actions = np.asarray(mb_d_actions, dtype=np.int32)
-        mb_a_actions = np.asarray(mb_a_actions, dtype=np.int32)
-        mb_d_values = np.asarray(mb_d_values, dtype=np.float32)
-        mb_a_values = np.asarray(mb_a_values, dtype=np.float32)
+        mb_obs = np.asarray(mb_obs, dtype=self.ob_dtype)
+        mb_rewards = np.asarray(mb_rewards, dtype=np.float32)
+        mb_actions = np.asarray(mb_actions, dtype=np.float32)
+        mb_values = np.asarray(mb_values, dtype=np.float32)
         mb_dones = np.asarray(mb_dones, dtype=np.bool)
+        mb_dones = mb_dones[1:]
 
-        # TODO add bootstrap
-        # if self.gamma > 0.0:
-        #     # Discount/bootstrap off value fn for defender
-        #     last_values = self.d_model.value(self.obs).tolist()
-        #     for n, (rewards, dones, value) in enumerate(zip(mb_d_rewards, mb_dones, last_values)):
-        #         rewards = rewards.tolist()
-        #         dones = dones.tolist()
-        #         if dones[-1] == 0:
-        #             rewards = discount_with_dones(rewards+[value], dones+[0], self.gamma)[:-1]
-        #         else:
-        #             rewards = discount_with_dones(rewards, dones, self.gamma)
-        #
-        #         mb_d_rewards[n] = rewards
-        #
-        #     # Discount/bootstrap off value fn for attacker
-        #     last_values = self.a_model.value(self.obs).tolist()
-        #     for n, (rewards, dones, value) in enumerate(zip(mb_a_rewards, mb_dones, last_values)):
-        #         rewards = rewards.tolist()
-        #         dones = dones.tolist()
-        #         if dones[-1] == 0:
-        #             rewards = discount_with_dones(rewards+[value], dones+[0], self.gamma)[:-1]
-        #         else:
-        #             rewards = discount_with_dones(rewards, dones, self.gamma)
-        #
-        #         mb_a_rewards[n] = rewards
+        if self.gamma > 0.0:
+            # Discount/bootstrap off value fn
+            last_values = self.model.value(self.obs, S=self.states, M=self.dones).tolist()
+            for n, (rewards, dones, value) in enumerate(zip(mb_rewards, mb_dones, last_values)):
+                rewards = rewards.tolist()
+                dones = dones.tolist()
+                if dones[-1] == 0:
+                    rewards = discount_with_dones(rewards+[value], dones+[0], self.gamma)[:-1]
+                else:
+                    rewards = discount_with_dones(rewards, dones, self.gamma)
 
-        return mb_obs, \
-               (mb_d_rewards, mb_a_rewards), \
-               (mb_d_actions, mb_a_actions), \
-               (mb_d_values, mb_a_values), \
-               epinfos
+                mb_rewards[n] = rewards
+        
+        return mb_obs, mb_states, mb_rewards, mb_masks, mb_actions, mb_values, None
