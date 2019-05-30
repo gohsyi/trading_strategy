@@ -17,6 +17,7 @@ class Env(object):
         
         self.tick = 0
         self.x = [0]  # rewards in history, used as agents' obervation
+        self.position = 0
 
     def reset(self):
         """
@@ -25,6 +26,7 @@ class Env(object):
         
         self.tick = 0
         self.x = [0]
+        self.position = 0
         
         return self.x
 
@@ -39,6 +41,15 @@ class Env(object):
         - done: True if entering a new day, else False
         - info: other information
         """
+
+        self.position += action
+
+        if self.position > 5:
+            self.position = 5
+            action = 0
+        elif self.position < -5:
+            self.position = -5
+            action = 0
         
         reward = action * (self.price[self.tick + 1] - self.price[self.tick])
         

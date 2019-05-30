@@ -1,7 +1,6 @@
 import numpy as np
 
 from baselines.a2c.utils import discount_with_dones
-from baselines.common.runners import AbstractEnvRunner
 
 
 class Runner(object):
@@ -21,7 +20,7 @@ class Runner(object):
         self.gamma = gamma
         
         # pre-set
-        self.obs = env.reset()
+        self.ob = env.reset()
         self.done = False
 
     def run(self):
@@ -31,42 +30,29 @@ class Runner(object):
         for n in range(self.batchsize):
             # Given observations, take action and value (V(s))
             # We already have self.obs because Runner superclass run self.obs[:] = env.reset() on init
-            action, value = self.model.step(self.obs)
+            action, value = self.model.step(self.ob)
 
             # Append the experiences
-            mb_obs.append(self.obs)
+            mb_obs.append(self.ob)
             mb_actions.append(action)
             mb_values.append(value)
-            mb_dones.append(self.done)
 
             # Take actions in env and look the results
-            obs, reward, done, _ = self.env.step(actions)
+            ob, reward, done, _ = self.env.step(action)
             self.done = done
-            self.obs = obs
+            self.ob = ob
             mb_dones.append(done)
-            mb_rewards.append(rewards)
-            
-        mb_dones.append(self.done)
+            mb_rewards.append(reward)
 
         # Batch of steps to batch of rollouts
-        mb_obs = np.asarray(mb_obs, dtype=self.ob_dtype)
+        mb_obs = np.asarray(mb_obs, dtype=np.float32)
         mb_rewards = np.asarray(mb_rewards, dtype=np.float32)
         mb_actions = np.asarray(mb_actions, dtype=np.float32)
         mb_values = np.asarray(mb_values, dtype=np.float32)
         mb_dones = np.asarray(mb_dones, dtype=np.bool)
-        mb_dones = mb_dones[1:]
 
         if self.gamma > 0.0:
-            # Discount/bootstrap off value fn
-            last_values = self.model.value(self.obs, S=self.states, M=self.dones).tolist()
-            for n, (rewards, dones, value) in enumerate(zip(mb_rewards, mb_dones, last_values)):
-                rewards = rewards.tolist()
-                dones = dones.tolist()
-                if dones[-1] == 0:
-                    rewards = discount_with_dones(rewards+[value], dones+[0], self.gamma)[:-1]
-                else:
-                    rewards = discount_with_dones(rewards, dones, self.gamma)
+            # Discount/bootstrap
+            mb_rewards = discount_with_dones(mb_rewards.tolist(), mb_dones.tolist(), self.gamma)
 
-                mb_rewards[n] = rewards
-        
-        return mb_obs, mb_states, mb_rewards, mb_masks, mb_actions, mb_values, None
+        return mb_obs, mb_rewards, mb_actions, mb_values

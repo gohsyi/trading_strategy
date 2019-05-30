@@ -161,7 +161,7 @@ def learn(
     lr=7e-4,
     gamma=0.99,
     log_interval=1,
-    load_paths=None):
+    load_path=None):
 
     '''
     Main entrypoint for A2C algorithm. Train a policy with given network architecture on a given environment using a2c algorithm.
@@ -203,7 +203,7 @@ def learn(
     set_global_seeds(seed)
 
     # Instantiate the model objects (that creates defender_model and adversary_model)
-    d_model = Model(
+    model = Model(
         name='defender',
         env=env,
         lr=lr,
@@ -216,34 +216,15 @@ def learn(
         total_epoches=total_epoches,
         log_interval=log_interval)
 
-    a_model = Model(
-        name='attacker',
-        env=env,
-        lr=lr,
-        latents=args.latents,
-        activation=args.activation,
-        optimizer=args.optimizer,
-        vf_coef=vf_coef,
-        ent_coef=ent_coef,
-        max_grad_norm=max_grad_norm,
-        total_epoches=total_epoches,
-        log_interval=log_interval)
-
-    if load_paths is not None:
-        d_model.load(load_paths[0])
-        a_model.load(load_paths[1])
+    if load_path is not None:
+        model.load(load_path)
 
     # Instantiate the runner object
-    runner = Runner(env, d_model, a_model, nsteps=nsteps, gamma=gamma)
+    runner = Runner(env, model, batchsize=nsteps, gamma=gamma)
 
     for ep in range(total_epoches):
         # Get mini batch of experiences
-        obs, rewards, actions, values, epinfos = runner.run()
-        d_rewards, a_rewards = rewards
-        d_actions, a_actions = actions
-        d_values, a_values = values
+        obs, rewards, actions, values = runner.run()
+        model.train(ep, obs, rewards, actions, values)
 
-        d_model.train(ep, obs, d_rewards, d_actions, d_values)
-        a_model.train(ep, obs, a_rewards, a_actions, a_values)
-
-    return d_model, a_model
+    return model
