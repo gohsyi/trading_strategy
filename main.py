@@ -8,7 +8,7 @@ if __name__ == '__main__':
     model = learn(
         env=env,
         seed=1953,
-        nsteps=args.batchsize,
+        batch_size=1,
         total_epoches=int(8e6),
         vf_coef=0.5,
         ent_coef=0.01,

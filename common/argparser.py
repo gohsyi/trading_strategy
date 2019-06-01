@@ -19,7 +19,7 @@ parser.add_argument('-model', type=str, default='a2c')
 parser.add_argument('-lr', type=float, default=1e-4)
 parser.add_argument('-lr_decay', action='store_true', default=False)
 parser.add_argument('-batchsize', type=int, default=64)
-parser.add_argument('-latents', type=str, default='256')
+parser.add_argument('-latents', type=str, default='4,4')
 parser.add_argument('-total_epoches', type=int, default=int(1e5))
 parser.add_argument('-vf_coef', type=float, default=0.1)
 parser.add_argument('-ent_coef', type=float, default=0.01)
@@ -49,6 +49,8 @@ abstract = '{}_{}_{}_lr{}{}hid{}_bs{}_ep{}_grad{}_vf{}_ent{}_seed{}'.format(
     args.ent_coef,
     args.seed,
 )
+
+args.latents = list(map(int, args.latents.split(',')))
 
 import os
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"

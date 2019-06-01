@@ -16,7 +16,7 @@ class Env(object):
         del self.ds
         
         self.tick = 0
-        self.x = [0]  # rewards in history, used as agents' obervation
+        self.x = [[0]]  # rewards in history, used as agents' obervation
         self.position = 0
 
     def reset(self):
@@ -25,7 +25,7 @@ class Env(object):
         """
         
         self.tick = 0
-        self.x = [0]
+        self.x = [[0]]
         self.position = 0
         
         return self.x
@@ -55,13 +55,11 @@ class Env(object):
         
         if self.day[self.tick + 1] != self.day[self.tick]:
             done = True
-            self.x = [0]
+            self.x = [[0]]
         else:
             done = False
-            self.x.append(reward)
+            self.x.append([reward])
         
         self.tick += 1
         
         return self.x, reward, done, None
-        
-        

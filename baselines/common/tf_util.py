@@ -108,6 +108,9 @@ def load_variables(load_path, variables=None, sess=None):
     sess.run(restores)
 
 
+def sample(logits):
+    return tf.squeeze(tf.multinomial(logits, 1), -1)
+
 def sample_k(logits, k):
     """
     sample the largest k logits

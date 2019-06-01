@@ -30,7 +30,9 @@ class Runner(object):
         for n in range(self.batchsize):
             # Given observations, take action and value (V(s))
             # We already have self.obs because Runner superclass run self.obs[:] = env.reset() on init
-            action, value = self.model.step(self.ob)
+            action, value = self.model.step(np.expand_dims(self.ob, 0))
+            action = int(np.squeeze(action))
+            value = int(np.squeeze(value))
 
             # Append the experiences
             mb_obs.append(self.ob)

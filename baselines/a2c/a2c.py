@@ -62,11 +62,10 @@ class Model(object):
 
         ob_size = env.ob_size
         act_size = env.act_size
-        n_actions = env.n_actions
 
         # placeholders for use
-        X = tf.placeholder(tf.float32, [None, ob_size], 'observation')
-        A = tf.placeholder(tf.int32, [None, act_size], 'action')
+        X = tf.placeholder(tf.float32, [None, None, ob_size], 'observation')
+        A = tf.placeholder(tf.int32, [None], 'action')
         ADV = tf.placeholder(tf.float32, [None], 'advantage')
         R = tf.placeholder(tf.float32, [None], 'reward')
 
@@ -74,7 +73,6 @@ class Model(object):
             policy = build_policy(
                 observations=X,
                 act_size=act_size,
-                n_actions=n_actions,
                 latents=latents,
                 vf_latents=latents,
                 activation=activation
@@ -84,12 +82,12 @@ class Model(object):
         # Total loss = Policy gradient loss - entropy * entropy coefficient + Value coefficient * value loss
 
         # Policy loss
-        neglogpac = policy.neglogp
+        neglogpac = policy.neglogp(A)
         # L = A(s,a) * -logpi(a|s)
         pg_loss = tf.reduce_mean(ADV * neglogpac)
 
         # Entropy is used to improve exploration by limiting the premature convergence to suboptimal policy.
-        entropy = tf.reduce_mean(policy.entropy)
+        entropy = tf.reduce_mean(policy.entropy())
 
         # Value loss
         vf_loss = losses.mean_squared_error(tf.squeeze(policy.vf), R)
@@ -110,14 +108,10 @@ class Model(object):
         _train = trainer.apply_gradients(grads)
 
         def step(obs):
-            return sess.run([policy.action, policy.vf], feed_dict={
-                X: np.reshape(obs, (-1, ob_size))
-            })
+            return sess.run([policy.action, policy.vf], feed_dict={X: obs})
 
         def value(obs):
-            return sess.run(policy.vf, feed_dict={
-                X: np.reshape(obs, (-1, ob_size))
-            })
+            return sess.run(policy.vf, feed_dict={X: obs})
 
         def train(ep, obs, rewards, actions, values):
             # Here we calculate advantage A(s,a) = R + yV(s') - V(s)
@@ -153,7 +147,7 @@ class Model(object):
 def learn(
     env,
     seed=None,
-    nsteps=5,
+    batch_size=5,
     total_epoches=int(80e6),
     vf_coef=0.5,
     ent_coef=0.01,
@@ -220,7 +214,7 @@ def learn(
         model.load(load_path)
 
     # Instantiate the runner object
-    runner = Runner(env, model, batchsize=nsteps, gamma=gamma)
+    runner = Runner(env, model, batchsize=batch_size, gamma=gamma)
 
     for ep in range(total_epoches):
         # Get mini batch of experiences
