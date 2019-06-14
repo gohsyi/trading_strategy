@@ -7,7 +7,7 @@ class Env(object):
     """
     
     def __init__(self, data_path):
-        self.ob_size = 1  # only an integer, previous reward
+        self.ob_size = 2  # observation is a tuple, (price, reward)
         self.act_size = 3  # -1, 0, +1: short position, idle, long position
         
         self.ds = pd.read_csv(data_path)
@@ -16,7 +16,7 @@ class Env(object):
         del self.ds
         
         self.tick = 0
-        self.x = [[0]]  # rewards in history, used as agents' obervation
+        self.x = [[self.price[0], 0]]  # rewards in history, used as agents' obervation
         self.position = 0
 
     def reset(self):
@@ -25,7 +25,7 @@ class Env(object):
         """
         
         self.tick = 0
-        self.x = [[0]]
+        self.x = [[self.price[0], 0]]
         self.position = 0
         
         return self.x
@@ -42,6 +42,7 @@ class Env(object):
         - info: other information
         """
 
+        action -= 1
         self.position += action
 
         if self.position > 5:
@@ -55,10 +56,10 @@ class Env(object):
         
         if self.day[self.tick + 1] != self.day[self.tick]:
             done = True
-            self.x = [[0]]
+            self.x = [[self.price[0], 0]]
         else:
             done = False
-            self.x.append([reward])
+            self.x.append([self.price[self.tick + 1], reward])
         
         self.tick += 1
         

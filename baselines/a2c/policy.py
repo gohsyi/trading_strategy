@@ -19,7 +19,7 @@ class Policy(object):
         with tf.variable_scope('actor'):
             latent = layers.lstm(observations, latents, activation)
             logits = layers.dense(latent, act_size)  # to compute loss
-            action = sample(logits)
+            action = sample(tf.nn.softmax(logits))
 
         with tf.variable_scope('critic'):
             vf_latent = layers.lstm(observations, vf_latents, activation)

@@ -124,18 +124,10 @@ class Model(object):
                 td_map
             )
 
-            if (ep + 1) % log_interval == 0:
-                avg_rewards = float(np.mean(rewards))
-                avg_values = float(np.mean(values))
-                avg_advs = float(np.mean(advs))
-
-                output(f'ep:%i\tlr:%f\t' % (ep, cur_lr) +
-                       f'pg_loss:%.3f\tvf_loss:%.3f\tent_loss:%.3f\t' % (policy_loss, value_loss, policy_entropy) +
-                       f'avg_rew:%.2f\tavg_val:%.2f\tavg_adv:%.2f\t' % (avg_rewards, avg_values, avg_advs))
-
             return policy_loss, value_loss, policy_entropy
 
 
+        self.output = output
         self.train = train
         self.step = step
         self.value = value
@@ -198,7 +190,7 @@ def learn(
 
     # Instantiate the model objects (that creates defender_model and adversary_model)
     model = Model(
-        name='defender',
+        name='trader',
         env=env,
         lr=lr,
         latents=args.latents,
@@ -219,6 +211,19 @@ def learn(
     for ep in range(total_epoches):
         # Get mini batch of experiences
         obs, rewards, actions, values = runner.run()
-        model.train(ep, obs, rewards, actions, values)
+        policy_loss, value_loss, policy_entropy = model.train(ep, obs, rewards, actions, values)
+
+        if ep % log_interval == 0:
+            avg_rewards = float(np.mean(rewards))
+            avg_values = float(np.mean(values))
+
+            idle_prob = float(np.mean(actions==1))
+            long_prob = float(np.mean(actions==2))
+            short_prob = float(np.mean(actions==0))
+
+            model.output(f'ep:%i\t' % ep +
+                         f'pg_loss:%.3f\tvf_loss:%.3f\tent_loss:%.3f\t' % (policy_loss, value_loss, policy_entropy) +
+                         f'avg_rew:%.2f\tavg_val:%.2f\t' % (avg_rewards, avg_values) +
+                         f'long:%.2f\tshort:%.2f\tidle:%.2f' % (long_prob, short_prob, idle_prob))
 
     return model
