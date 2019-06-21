@@ -12,7 +12,6 @@ from baselines.common import tf_util
 from baselines.common import set_global_seeds
 
 from baselines.a2c.policy import build_policy
-from baselines.a2c.utils import find_trainable_variables
 from baselines.a2c.runner import Runner
 
 
@@ -94,7 +93,7 @@ class Model(object):
         loss = pg_loss - entropy * ent_coef + vf_loss * vf_coef
 
         # gradients and optimizer
-        params = find_trainable_variables(name)
+        params = tf.trainable_variables(name)
         grads = tf.gradients(loss, params)
         if max_grad_norm is not None:
             # Clip the gradients (normalize)
