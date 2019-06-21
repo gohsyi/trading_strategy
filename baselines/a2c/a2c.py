@@ -41,8 +41,7 @@ class Model(object):
             vf_coef=0.1,  # vf_loss weight
             ent_coef=0.01,  # ent_loss weight
             max_grad_norm=0.5,  # grad normalization
-            total_epoches=int(80e6),  # total number of epoches
-            log_interval=100):  # how frequently the logs are printed out
+            total_epoches=int(80e6)):  # total number of epoches
 
         sess = tf_util.get_session()
 
@@ -185,7 +184,6 @@ def learn(
 
     '''
 
-
     set_global_seeds(seed)
 
     # Instantiate the model objects (that creates defender_model and adversary_model)
@@ -199,8 +197,7 @@ def learn(
         vf_coef=vf_coef,
         ent_coef=ent_coef,
         max_grad_norm=max_grad_norm,
-        total_epoches=total_epoches,
-        log_interval=log_interval)
+        total_epoches=total_epoches)
 
     if load_path is not None:
         model.load(load_path)
