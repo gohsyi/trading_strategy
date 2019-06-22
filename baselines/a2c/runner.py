@@ -34,17 +34,18 @@ class Runner(object):
             action = int(np.squeeze(action))
             value = float(np.squeeze(value))
 
-            # Append the experiences
-            mb_obs.append(self.ob)
-            mb_actions.append(action)
-            mb_values.append(value)
-
             # Take actions in env and look the results
             ob, reward, done, _ = self.env.step(action)
             self.done = done
             self.ob = ob
-            mb_dones.append(done)
-            mb_rewards.append(reward)
+
+            # Append the experiences
+            if len(self.ob) == 10:
+                mb_obs.append(self.ob)
+                mb_actions.append(action)
+                mb_values.append(value)
+                mb_dones.append(done)
+                mb_rewards.append(reward)
 
         # Batch of steps to batch of rollouts
         mb_obs = np.array(mb_obs, dtype=np.float32)
