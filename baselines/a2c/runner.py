@@ -32,7 +32,7 @@ class Runner(object):
             # We already have self.obs because Runner superclass run self.obs[:] = env.reset() on init
             action, value = self.model.step(np.expand_dims(self.ob, 0))
             action = int(np.squeeze(action))
-            value = int(np.squeeze(value))
+            value = float(np.squeeze(value))
 
             # Append the experiences
             mb_obs.append(self.ob)
@@ -47,11 +47,11 @@ class Runner(object):
             mb_rewards.append(reward)
 
         # Batch of steps to batch of rollouts
-        mb_obs = np.asarray(mb_obs, dtype=np.float32)
-        mb_rewards = np.asarray(mb_rewards, dtype=np.float32)
-        mb_actions = np.asarray(mb_actions, dtype=np.float32)
-        mb_values = np.asarray(mb_values, dtype=np.float32)
-        mb_dones = np.asarray(mb_dones, dtype=np.bool)
+        mb_obs = np.array(mb_obs, dtype=np.float32)
+        mb_rewards = np.array(mb_rewards, dtype=np.float32)
+        mb_actions = np.array(mb_actions, dtype=np.float32)
+        mb_values = np.array(mb_values, dtype=np.float32)
+        mb_dones = np.array(mb_dones, dtype=np.bool)
 
         if self.gamma > 0.0:
             # Discount/bootstrap

@@ -1,7 +1,7 @@
+from common import args
+
 import pandas as pd
 import xgboost as xgb
-
-from common import args
 
 
 class Env(object):
@@ -9,11 +9,11 @@ class Env(object):
     Environment
     """
     
-    def __init__(self, data_path):
+    def __init__(self):
         self.ob_size = 2  # observation, (price, predicted price 10 time steps after)
         self.act_size = 3  # -1, 0, +1: short position, idle, long position
 
-        dataset = pd.read_csv(data_path)
+        dataset = pd.read_csv(args.train_path)
 
         indicators = dataset.columns.values[:108].tolist()
         market_stat = ['midPrice', 'LastPrice', 'Volume', 'LastVolume', 'Turnover', 'LastTurnover',
@@ -81,4 +81,4 @@ class Env(object):
             done = False
             self.x.append(self.get_observation())
         
-        return self.x, reward, done, None
+        return self.x[-10:], reward, done, None  # use the last 10

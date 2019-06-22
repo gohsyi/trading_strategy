@@ -4,7 +4,7 @@ from baselines.a2c.a2c import learn
 
 
 if __name__ == '__main__':
-    env = Env(args.train_path)
+    env = Env()
     model = learn(
         env=env,
         seed=1953,
