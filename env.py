@@ -14,11 +14,17 @@ class Env(object):
         self.act_size = 3  # -1, 0, +1: short position, idle, long position
 
         dataset = pd.read_csv(data_path)
-        data = dataset.drop('label', axis=1)
+
+        indicators = dataset.columns.values[:108].tolist()
+        market_stat = ['midPrice', 'LastPrice', 'Volume', 'LastVolume', 'Turnover', 'LastTurnover',
+                       'OpenInterest', 'UpperLimitPrice', 'LowerLimitPrice', 'am_pm', 'UpdateMinute']
+        feature = indicators + market_stat
+        
+        data = dataset[feature]
         label = dataset['label']
 
         bst = xgb.Booster({'nthread': 4})  # init model
-        bst.load_model(args.xgb_model_path)  # load model
+        bst.load_model(args.xgb_path)  # load model
 
         self.pred = bst.predict(xgb.DMatrix(data, label=label))
         self.day = dataset['Day'].values

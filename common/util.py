@@ -15,7 +15,7 @@ def get_logger(name, folder=os.path.join('logs', args.note)):
     """
 
     if not os.path.exists(folder):
-        os.mkdir(folder)
+        os.makedirs(folder)
 
     if name in logging.Logger.manager.loggerDict:
         return logging.getLogger(name)
