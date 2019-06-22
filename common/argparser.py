@@ -30,8 +30,10 @@ parser.add_argument('-optimizer', type=str, default='adam',
                     help='adam/adagrad/gd/rms/momentum')
 
 # path setting
+parser.add_argument('-note', type=str, default='test')
 parser.add_argument('-train_path', type=str, default='../DataSet/TrainSet.csv')
 parser.add_argument('-test_path', type=str, default='../DataSet/TestSet.csv')
+parser.add_argument('-xgb_path', type=str, default='../XGBoosting_GBlinear.model')
 
 args = parser.parse_args()
 

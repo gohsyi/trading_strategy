@@ -45,7 +45,7 @@ class Policy(object):
         self.entropy = entropy
 
 
-def build_policy(observations, act_size, latents, vf_latents, activation=None):
+def build_policy(observations, act_size, latents, vf_latents, activation):
     """
     build a policy with given params
 

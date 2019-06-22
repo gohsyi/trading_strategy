@@ -1,4 +1,7 @@
 import pandas as pd
+import xgboost as xgb
+
+from common import args
 
 
 class Env(object):
@@ -7,16 +10,22 @@ class Env(object):
     """
     
     def __init__(self, data_path):
-        self.ob_size = 2  # observation is a tuple, (price, reward)
+        self.ob_size = 2  # observation, (price, predicted price 10 time steps after)
         self.act_size = 3  # -1, 0, +1: short position, idle, long position
-        
-        self.ds = pd.read_csv(data_path)
-        self.day = self.ds['Day'].values
-        self.price = self.ds['midPrice'].values
-        del self.ds
-        
+
+        dataset = pd.read_csv(data_path)
+        data = dataset.drop('label', axis=1)
+        label = dataset['label']
+
+        bst = xgb.Booster({'nthread': 4})  # init model
+        bst.load_model(args.xgb_model_path)  # load model
+
+        self.pred = bst.predict(xgb.DMatrix(data, label=label))
+        self.day = dataset['Day'].values
+        self.price = dataset['midPrice'].values
+
         self.tick = 0
-        self.x = [[self.price[0], 0]]  # rewards in history, used as agents' obervation
+        self.x = [self.get_observation()]
         self.position = 0
 
     def reset(self):
@@ -25,15 +34,18 @@ class Env(object):
         """
         
         self.tick = 0
-        self.x = [[self.price[0], 0]]
+        self.x = [self.get_observation()]
         self.position = 0
         
         return self.x
 
-    def step(self, action):
+    def get_observation(self):
+        return (self.price[self.tick], self.pred[self.tick])
+
+    def step(self, raw_action):
         """
         agent take an action
-        :param action: the action taken, [-1, 1], representing sell/sold secure
+        :param raw_action: the action taken, {0, 1, 2}, representing short/idle/long
         
         :return: 
         - observation: observation of the next step
@@ -42,25 +54,25 @@ class Env(object):
         - info: other information
         """
 
-        action -= 1
+        action = raw_action - 1
         self.position += action
 
-        if self.position > 5:
-            self.position = 5
+        if self.position > args.max_position:
+            self.position = args.max_position
             action = 0
-        elif self.position < -5:
-            self.position = -5
+        elif self.position < -args.max_position:
+            self.position = -args.max_position
             action = 0
-        
-        reward = action * (self.price[self.tick + 1] - self.price[self.tick])
-        
-        if self.day[self.tick + 1] != self.day[self.tick]:
+
+        # next timestep
+        self.tick += 1
+        reward = action * (self.price[self.tick] - self.price[self.tick - 1])
+
+        if self.day[self.tick] != self.day[self.tick - 1]:
             done = True
-            self.x = [[self.price[0], 0]]
+            self.x = [self.get_observation()]
         else:
             done = False
-            self.x.append([self.price[self.tick + 1], reward])
-        
-        self.tick += 1
+            self.x.append(self.get_observation())
         
         return self.x, reward, done, None
