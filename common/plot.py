@@ -71,9 +71,10 @@ def plot(folder, terms, smooth, linewidth):
 
     for term in terms:
         subterms = term.split(',')
+        title = subterms[0] if len(subterms) == 1 else subterms[0].split('_')[-1]
+
         if len(data[subterms[0]]) > 0:
-            title = subterms[0].split('_')[-1]
-            print(f'plotting {title}.jpg')
+            print(f'plotting {os.path.join(folder, f"{title}.jpg")}')
             splt.plot([np.array(data[subterm]) for subterm in subterms],
                       label=[subterm for subterm in subterms],
                       save_path=os.path.join(folder, f'{title}.jpg'),
