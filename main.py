@@ -13,12 +13,12 @@ from baselines.common import set_global_seeds
 
 
 if __name__ == '__main__':
-    env = Env()
-
     set_global_seeds(args.seed)
 
     logger = get_logger('a2c')
     logger.info(str(args))
+
+    env = Env(args.train_path)
 
     # Instantiate the model objects (that creates defender_model and adversary_model)
     model = Model(
@@ -39,6 +39,7 @@ if __name__ == '__main__':
     # Instantiate the runner object
     runner = Runner(env, model, batchsize=args.batchsize, gamma=args.gamma)
 
+    """ train """
     for ep in range(args.total_epoches):
         # Get mini batch of experiences
         obs, rewards, actions, values = runner.run()
@@ -64,5 +65,18 @@ if __name__ == '__main__':
 
         if (ep + 1) % args.save_interval == 0:
             model.save(os.path.join(folder, f'model_{ep}.ckpt'))
+
+
+    """ test """
+    env = Env(args.test_path)
+    observation = env.reset()
+    done = False
+    step = 0
+
+    while not done:
+        action, value = model.step([observation])
+        observation, reward, done, info = env.step(int(action))
+        logger.warn(f'step:{step}\tval_act:{int(action)}\tval_rew:{reward}')
+        step += 1
 
     plot(folder, args.terms, args.smooth, args.linewidth)

@@ -3,7 +3,7 @@ import os
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-plt.style.use("ggplot")
+plt.style.use('seaborn-darkgrid')
 
 import numpy as np
 
@@ -12,7 +12,7 @@ class SmoothPlot():
     def __init__(self, smooth_rate=0, linewidth=1.0):
         self.smooth_rate = smooth_rate
         self.linewidth = linewidth
-        self.colors = ['r', 'b', 'c', 'g', 'm', 'y', 'k', 'w']
+        self.colors = ['C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9']
 
     def plot(self, data, save_path=None, title=None, label=None):
         if type(data) == list and type(label) == list:
@@ -22,7 +22,7 @@ class SmoothPlot():
 
         elif type(data) == np.ndarray:
             plt.plot(data, c='r', alpha=0.2, linewidth=1.0)
-            plt.plot(self.smooth_moving_average(data), label=label, c='r', linewidth=self.linewidth)
+            plt.plot(self.smooth_moving_average(data), label=label, c='C0', linewidth=self.linewidth)
 
         else:
             raise TypeError
@@ -43,7 +43,7 @@ class SmoothPlot():
     def smooth_moving_average(self, arr):
         ret = [arr[0]]
         for i in range(1, len(arr)):
-            ret.append(ret[i - 1] * self.smooth_rate + arr[i] * (1-self.smooth_rate))
+            ret.append(ret[i-1] * self.smooth_rate + arr[i] * (1-self.smooth_rate))
         return ret
 
     def smooth_average(self, arr):

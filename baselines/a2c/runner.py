@@ -31,13 +31,11 @@ class Runner(object):
             # Given observations, take action and value (V(s))
             # We already have self.obs because Runner superclass run self.obs[:] = env.reset() on init
             action, value = self.model.step(np.expand_dims(self.ob, 0))
-            action = int(np.squeeze(action))
-            value = float(np.squeeze(value))
+            action, value = int(action), float(value)
 
             # Take actions in env and look the results
             ob, reward, done, _ = self.env.step(action)
-            self.done = done
-            self.ob = ob
+            self.done, self.ob = done, ob
 
             # Append the experiences
             if len(self.ob) == 10:

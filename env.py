@@ -9,11 +9,11 @@ class Env(object):
     Environment
     """
     
-    def __init__(self):
+    def __init__(self, data_path):
         self.ob_size = 2  # observation, (price, predicted price 10 time steps after)
         self.act_size = 3  # -1, 0, +1: short position, idle, long position
 
-        dataset = pd.read_csv(args.train_path)
+        dataset = pd.read_csv(data_path)
 
         indicators = dataset.columns.values[:108].tolist()
         market_stat = ['midPrice', 'LastPrice', 'Volume', 'LastVolume', 'Turnover', 'LastTurnover',
