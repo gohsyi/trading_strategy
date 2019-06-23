@@ -63,7 +63,6 @@ if __name__ == '__main__':
             )
 
         if (ep + 1) % args.save_interval == 0:
-            model_note = ep // args.save_interval
-            model.save(os.path.join(folder, f'model_{model_note}.ckpt'))
+            model.save(os.path.join(folder, f'model_{ep}.ckpt'))
 
     plot(folder, args.terms, args.smooth, args.linewidth)
