@@ -41,6 +41,7 @@ class Policy(object):
 
 
         self.vf = vf
+        self.logits = logits
         self.action = action
         self.neglogp = neglogp
         self.entropy = entropy

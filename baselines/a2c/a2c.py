@@ -71,7 +71,7 @@ class Model(object):
         entropy = tf.reduce_mean(policy.entropy())
 
         # Value loss
-        vf_loss = losses.mean_squared_error(tf.squeeze(policy.vf), R)
+        vf_loss = losses.mean_squared_error(R, policy.vf)
 
         loss = pg_loss - entropy * ent_coef + vf_loss * vf_coef
 
