@@ -1,6 +1,7 @@
 import tensorflow as tf
 
-from baselines.common import layers, sample
+from baselines.common import layers
+from baselines.a2c.utils import sample
 
 
 class Policy(object):

@@ -1,12 +1,10 @@
 import os, sys, time, logging
-
-from common import args
 from contextlib import contextmanager
 
-from common.argparser import abstract
+from common.argparser import folder
 
 
-def get_logger(name, folder=os.path.join('logs', args.note)):
+def get_logger(name, folder=folder):
     """
     get a logger with std output and file output
     :param folder: logger folder

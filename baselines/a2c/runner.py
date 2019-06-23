@@ -49,8 +49,8 @@ class Runner(object):
 
         # Batch of steps to batch of rollouts
         mb_obs = np.array(mb_obs, dtype=np.float32)
-        mb_rewards = np.array(mb_rewards, dtype=np.float32)
         mb_actions = np.array(mb_actions, dtype=np.float32)
+        mb_rewards = np.array(mb_rewards, dtype=np.float32)
         mb_values = np.array(mb_values, dtype=np.float32)
         mb_dones = np.array(mb_dones, dtype=np.bool)
 
@@ -58,4 +58,4 @@ class Runner(object):
             # Discount/bootstrap
             mb_rewards = discount_with_dones(mb_rewards.tolist(), mb_dones.tolist(), self.gamma)
 
-        return mb_obs, mb_rewards, mb_actions, mb_values
+        return mb_obs, mb_actions, mb_rewards, mb_values

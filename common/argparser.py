@@ -1,3 +1,4 @@
+import os
 import argparse
 
 
@@ -18,6 +19,7 @@ parser.add_argument('-model', type=str, default='a2c')
 # experiment setting
 parser.add_argument('-lr', type=float, default=1e-4)
 parser.add_argument('-lr_decay', action='store_true', default=False)
+parser.add_argument('-gamma', type=float, default=0.9, help='reward decay factor')
 parser.add_argument('-batchsize', type=int, default=64)
 parser.add_argument('-latents', type=str, default='4,4')
 parser.add_argument('-total_epoches', type=int, default=int(1e5))
@@ -33,30 +35,26 @@ parser.add_argument('-optimizer', type=str, default='adam',
 parser.add_argument('-note', type=str, default='test')
 parser.add_argument('-train_path', type=str, default='../DataSet/TrainSet.csv')
 parser.add_argument('-test_path', type=str, default='../DataSet/valSet.csv')
+parser.add_argument('-load_path', type=str, default=None)
 parser.add_argument('-xgb_path', type=str, default='../XGBoosting_GBlinear.model')
 
-# env setting
+# environment setting
 parser.add_argument('-max_position', type=int, default=5)
 
+# save results
+parser.add_argument('-log_interval', type=int, default=1)
+parser.add_argument('-save_interval', type=int, default=None)
+parser.add_argument('-linewidth', type=float, default=1)
+parser.add_argument('-smooth', type=float, default=0, help='moving average smooth rate')
+parser.add_argument('-terms', type=str, default='pg_loss;vf_loss;ent_loss;avg_rew,avg_val;'
+                                                'long_prob,short_prob,idle_prob')
+
 args = parser.parse_args()
-
-abstract = '{}_{}_{}_lr{}{}hid{}_bs{}_ep{}_grad{}_vf{}_ent{}_seed{}'.format(
-    args.model,
-    args.activation,
-    args.optimizer,
-    args.lr,
-    '_decay_' if args.lr_decay else '_',
-    args.latents,
-    args.batchsize,
-    args.total_epoches,
-    args.max_grad_norm,
-    args.vf_coef,
-    args.ent_coef,
-    args.seed,
-)
-
+args.save_interval = args.save_interval or (args.total_epoches // 10)
 args.latents = list(map(int, args.latents.split(',')))
 
-import os
+folder = os.path.join('logs', args.note)
+
+
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
