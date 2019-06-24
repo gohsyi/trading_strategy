@@ -25,7 +25,7 @@ class Runner(object):
 
     def run(self):
         # We initialize the lists that will contain the mb of experiences
-        mb_obs, mb_rewards, mb_actions, mb_values, mb_dones = [],[],[],[],[]
+        mb_obs, mb_actions, mb_rewards, mb_values, mb_dones = [],[],[],[],[]
         
         for n in range(self.batchsize):
             # Given observations, take action and value (V(s))
@@ -41,9 +41,9 @@ class Runner(object):
             if len(self.ob) == 10:
                 mb_obs.append(self.ob)
                 mb_actions.append(action)
+                mb_rewards.append(reward)
                 mb_values.append(value)
                 mb_dones.append(done)
-                mb_rewards.append(reward)
 
         # Batch of steps to batch of rollouts
         mb_obs = np.array(mb_obs, dtype=np.float32)

@@ -42,8 +42,8 @@ if __name__ == '__main__':
     """ train """
     for ep in range(args.total_epoches):
         # Get mini batch of experiences
-        obs, rewards, actions, values = runner.run()
-        policy_loss, value_loss, policy_entropy = model.train(obs, rewards, actions, values)
+        obs, actions, rewards, values = runner.run()
+        policy_loss, value_loss, policy_entropy = model.train(obs, actions, rewards, values)
 
         if (ep + 1) % args.log_interval == 0:
             avg_rewards = float(np.mean(rewards))

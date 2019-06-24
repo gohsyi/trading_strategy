@@ -102,7 +102,7 @@ class Model(object):
                 X: obs
             })
 
-        def logits(obs):
+        def debug_output(obs):
             """
             This function is only for debug
             """
@@ -138,6 +138,6 @@ class Model(object):
         self.load = load
 
         # for debug
-        self.logits = logits
+        self.debug_output = debug_output
 
         tf.global_variables_initializer().run(session=sess)
