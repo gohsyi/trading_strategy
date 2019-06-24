@@ -26,7 +26,7 @@ parser.add_argument('-total_epoches', type=int, default=int(1e5))
 parser.add_argument('-vf_coef', type=float, default=0.1)
 parser.add_argument('-ent_coef', type=float, default=0.01)
 parser.add_argument('-max_grad_norm', type=float, default=0.5)
-parser.add_argument('-activation', type=str, default='relu',
+parser.add_argument('-activation', type=str, default='tanh',
                     help='relu/sigmoid/elu/tanh')
 parser.add_argument('-optimizer', type=str, default='adam',
                     help='adam/adagrad/gd/rms/momentum')

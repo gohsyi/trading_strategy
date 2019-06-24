@@ -102,6 +102,14 @@ class Model(object):
                 X: obs
             })
 
+        def logits(obs):
+            """
+            This function is only for debug
+            """
+            return sess.run([policy.logits, policy.latent, policy.vf_latent], feed_dict={
+                X: obs
+            })
+
         def train(obs, actions, rewards, values):
             # Here we calculate advantage A(s,a) = R + yV(s') - V(s)
             # rewards = R + yV(s')
@@ -128,5 +136,8 @@ class Model(object):
         self.value = value
         self.save = save
         self.load = load
+
+        # for debug
+        self.logits = logits
 
         tf.global_variables_initializer().run(session=sess)

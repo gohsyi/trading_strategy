@@ -41,10 +41,14 @@ class Policy(object):
 
 
         self.vf = vf
-        self.logits = logits
         self.action = action
         self.neglogp = neglogp
         self.entropy = entropy
+
+        # for debug
+        self.latent = latent
+        self.vf_latent = vf_latent
+        self.logits = logits
 
 
 def build_policy(observations, act_size, latents, vf_latents, activation):

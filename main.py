@@ -58,7 +58,7 @@ if __name__ == '__main__':
                 # losses
                 f'pg_loss:{policy_loss:.3f}\tvf_loss:{value_loss:.3f}\tent_loss:{policy_entropy:.3f}\t'
                 # reward and estimated rewards
-                f'avg_rew:{avg_rewards:.2f}\tavg_val:{avg_values:.2f}\t'
+                f'avg_rew:{avg_rewards:.3f}\tavg_val:{avg_values:.3f}\t'
                 # action proportion
                 f'long_prob:{long_prob:.2f}\tshort_prob:{short_prob:.2f}\tidle_prob:{idle_prob:.2f}'
             )

@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 
-def dense(inputs, units, name=None, activation=None):
+def dense(inputs, units, activation=None):
     """
     construct a fully-connected layer
 
@@ -14,7 +14,6 @@ def dense(inputs, units, name=None, activation=None):
 
     return tf.layers.dense(
         inputs, units,
-        # name=name,
         activation=activation,
         kernel_initializer=tf.truncated_normal_initializer(stddev=0.5)
     )
@@ -32,7 +31,7 @@ def mlp(x, latents, activation=None):
 
     last_latent = x
     for i, hdim in enumerate(latents):
-        last_latent = dense(last_latent, hdim, 'layer%i' % i, activation)
+        last_latent = dense(last_latent, hdim, activation)
     return last_latent
 
 
@@ -50,11 +49,11 @@ def lstm(x, latents, activation=None, dropout=1.):
     lstm_cells = []
     for hdim in latents:
         lstm_cell = tf.nn.rnn_cell.LSTMCell(hdim, activation=activation)
-        lstm_cell = tf.nn.rnn_cell.DropoutWrapper(
-            lstm_cell,
-            input_keep_prob=dropout,
-            output_keep_prob=dropout
-        )
+        # lstm_cell = tf.nn.rnn_cell.DropoutWrapper(
+        #     lstm_cell,
+        #     input_keep_prob=dropout,
+        #     output_keep_prob=dropout
+        # )
         lstm_cells.append(lstm_cell)
 
     cell = tf.nn.rnn_cell.MultiRNNCell(lstm_cells)
