@@ -34,7 +34,7 @@ parser.add_argument('-optimizer', type=str, default='adam',
 # path setting
 parser.add_argument('-note', type=str, default='test')
 parser.add_argument('-train_path', type=str, default='../DataSet/TrainSet.csv')
-parser.add_argument('-test_path', type=str, default='../DataSet/valSet.csv')
+parser.add_argument('-test_path', type=str, default='../DataSet/ValSet.csv')
 parser.add_argument('-load_path', type=str, default=None)
 parser.add_argument('-xgb_path', type=str, default='../XGBoosting_GBlinear.model')
 
