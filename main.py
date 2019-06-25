@@ -7,9 +7,17 @@ from env import Env
 import os
 import numpy as np
 
-from baselines.a2c.a2c import Model
-from baselines.a2c.runner import Runner
-from baselines.common import set_global_seeds
+from rl.a2c.a2c import Model
+from rl.a2c.runner import Runner
+from rl.common import set_global_seeds
+
+from baselines.stochastic import Model as Stochastic
+from baselines.rule1 import Model as Rule1
+from baselines.rule2 import Model as Rule2
+
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 
 if __name__ == '__main__':
@@ -67,16 +75,38 @@ if __name__ == '__main__':
             model.save(os.path.join(folder, f'model_{ep}.ckpt'))
 
 
-    """ test """
-    env = Env(args.test_path)
-    observation = env.reset()
-    done = False
-    step = 0
+    models = [
+        model,
+        Stochastic(env.act_size),
+        Rule1(),
+        Rule2(),
+    ]
 
-    while not done:
-        action, value = model.step([observation])
-        observation, reward, done, info = env.step(int(action))
-        logger.warn(f'step:{step}\tval_act:{int(action)}\tval_rew:{reward}')
-        step += 1
+    model_names = [
+        # 'a2c',
+        'stochastic',
+        'rule1',
+        'rule2',
+    ]
+
+    """ test """
+    for (i, model), model_name in zip(enumerate(models), model_names):
+        profits = [0]
+        env = Env(args.test_path)
+        observation = env.reset()
+        done = False
+        step = 0
+
+        while not done:
+            action, _ = model.step([observation])
+            observation, reward, done, _ = env.step(int(action))
+            profits.append(profits[-1] + reward)
+            logger.warn(f'step:{step}\tval_act:{int(action)}\tval_rew:{reward}')
+            step += 1
+
+        plt.plot(profits, f'C{i}', label=model_name)
+
+    plt.legend()
+    plt.savefig(os.path.join(folder, 'val.jpg'))
 
     plot(folder, args.terms, args.smooth, args.linewidth)

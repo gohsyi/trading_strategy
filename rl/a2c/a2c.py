@@ -2,8 +2,8 @@ import tensorflow as tf
 
 from tensorflow import losses
 
-from baselines.common import tf_util
-from baselines.a2c.policy import build_policy
+from rl.common import tf_util
+from rl.a2c.policy import build_policy
 
 
 class Model(object):
@@ -130,6 +130,7 @@ class Model(object):
         def load(load_path):
             saver.restore(sess, load_path)
             print(f'Model restored from {load_path}')
+
 
         self.train = train
         self.step = step

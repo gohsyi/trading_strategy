@@ -20,7 +20,7 @@ class Env(object):
         market_stat = ['midPrice', 'LastPrice', 'Volume', 'LastVolume', 'Turnover', 'LastTurnover',
                        'OpenInterest', 'UpperLimitPrice', 'LowerLimitPrice', 'am_pm', 'UpdateMinute']
         feature = indicators + market_stat
-        
+         
         data = dataset[feature]
         label = dataset['label']
 

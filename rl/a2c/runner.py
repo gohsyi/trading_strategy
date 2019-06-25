@@ -1,6 +1,6 @@
 import numpy as np
 
-from baselines.a2c.utils import discount_with_dones
+from rl.a2c.utils import discount_with_dones
 
 
 class Runner(object):
