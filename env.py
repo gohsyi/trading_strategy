@@ -14,6 +14,7 @@ class Env(object):
         self.act_size = 3  # -1, 0, +1: short position, idle, long position
 
         dataset = pd.read_csv(data_path)
+        self.n_rows = dataset.shape[0]
 
         indicators = dataset.columns.values[:108].tolist()
         market_stat = ['midPrice', 'LastPrice', 'Volume', 'LastVolume', 'Turnover', 'LastTurnover',
@@ -71,7 +72,7 @@ class Env(object):
             action = 0
 
         # next timestep
-        self.tick += 1
+        self.tick = (self.tick + 1) % self.n_rows
         reward = action * (self.price[self.tick] - self.price[self.tick - 1])
 
         if self.day[self.tick] != self.day[self.tick - 1]:
