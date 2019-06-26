@@ -12,8 +12,7 @@ from rl.a2c.runner import Runner
 from rl.common import set_global_seeds
 
 from baselines.stochastic import Model as Stochastic
-from baselines.rule1 import Model as Rule1
-from baselines.rule2 import Model as Rule2
+from baselines.rule import Model as Rule
 
 import matplotlib
 matplotlib.use('Agg')
@@ -78,19 +77,17 @@ if __name__ == '__main__':
     models = [
         model,
         Stochastic(env.act_size),
-        Rule1(),
-        Rule2(),
+        Rule(),
     ]
 
     model_names = [
-        # 'a2c',
+        'a2c',
         'stochastic',
-        'rule1',
-        'rule2',
+        'rule',
     ]
 
     """ test """
-    for (i, model), model_name in zip(enumerate(models), model_names):
+    for model, model_name in zip(models, model_names):
         profits = [0]
         env = Env(args.test_path)
         observation = env.reset()
@@ -104,9 +101,10 @@ if __name__ == '__main__':
             logger.warn(f'step:{step}\tval_act:{int(action)}\tval_rew:{reward}')
             step += 1
 
-        plt.plot(profits, f'C{i}', label=model_name)
+        plt.plot(profits, label=model_name, linewidth=args.linewidth)
 
     plt.legend()
     plt.savefig(os.path.join(folder, 'val.jpg'))
+    plt.cla()
 
     plot(folder, args.terms, args.smooth, args.linewidth)
