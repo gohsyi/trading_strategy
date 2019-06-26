@@ -20,7 +20,7 @@ class Env(object):
         market_stat = ['midPrice', 'LastPrice', 'Volume', 'LastVolume', 'Turnover', 'LastTurnover',
                        'OpenInterest', 'UpperLimitPrice', 'LowerLimitPrice', 'am_pm', 'UpdateMinute']
         feature = indicators + market_stat
-         
+
         data = dataset[feature]
         label = dataset['label']
 
@@ -47,7 +47,10 @@ class Env(object):
         return self.x
 
     def get_observation(self):
-        return (self.price[self.tick], self.pred[self.tick])
+        if self.tick == 0:
+            return (1., self.pred[self.tick])
+        else:
+            return (self.price[self.tick] / self.price[self.tick-1], self.pred[self.tick])
 
     def step(self, raw_action):
         """
