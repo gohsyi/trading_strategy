@@ -98,7 +98,7 @@ if __name__ == '__main__':
             action, _ = model.step([observation])
             observation, reward, done, _ = env.step(int(action))
             profits.append(profits[-1] + reward)
-            logger.warn(f'step:{step}\tval_act:{int(action)}\tval_rew:{reward}')
+            # logger.warn(f'step:{step}\tval_act:{int(action)}\tval_rew:{reward}')
             step += 1
 
         plt.plot(profits, label=model_name, linewidth=args.linewidth)
