@@ -102,10 +102,10 @@ if __name__ == '__main__':
         while not done:
             action, _ = model.step([observation])
             observation, reward, done, _ = env.step(int(action))
-            avg_buy, avg_sell = env.get_avg_prices()
+            # avg_buy, avg_sell = env.get_avg_prices()
             profits.append(profits[-1] + reward)
-            avg_buys.append(avg_buy)
-            avg_sells.append(avg_sell)
+            # avg_buys.append(avg_buy)
+            # avg_sells.append(avg_sell)
             assets.append(env.get_asset())
             # logger.warn(f'step:{step}\tval_act:{int(action)}\tval_rew:{reward}')
             step += 1
