@@ -1,5 +1,6 @@
 from common import args
 
+import numpy as np
 import pandas as pd
 import xgboost as xgb
 
@@ -38,11 +39,11 @@ class Env(object):
         self.avg_bug = []
         self.avg_sell = []
 
-    def get_avg_prices():
-        return self.avg_bug.mean(), self.avg_sell.mean()
+    def get_avg_prices(self):
+        return np.mean(self.avg_bug), np.mean(self.avg_sell)
     
-    def get_price(time_step):
-        return self.price[time_step]
+    def get_price(self):
+        return self.price[self.tick]
 
     def reset(self):
         """
@@ -86,11 +87,11 @@ class Env(object):
             action = 0
 
         if action == -1:
-            avg_sell.append(self.get_price())
+            self.avg_sell.append(self.get_price())
         if action == 1:
-            avg_bug.append(self.get_price())
+            self.avg_bug.append(self.get_price())
 
-        # next timestep
+        # next time-step
         self.tick = (self.tick + 1) % self.n_rows
         reward = action * (self.price[self.tick] - self.price[self.tick - 1])
 

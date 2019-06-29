@@ -58,6 +58,7 @@ if __name__ == '__main__':
             idle_prob = float(np.mean(actions==1))
             long_prob = float(np.mean(actions==2))
             short_prob = float(np.mean(actions==0))
+            avg_buy, avg_sell = env.get_avg_prices()
 
             logger.warn(
                 # epoch number
@@ -67,7 +68,9 @@ if __name__ == '__main__':
                 # reward and estimated rewards
                 f'avg_rew:{avg_rewards:.3f}\tavg_val:{avg_values:.3f}\t'
                 # action proportion
-                f'long_prob:{long_prob:.2f}\tshort_prob:{short_prob:.2f}\tidle_prob:{idle_prob:.2f}'
+                f'long_prob:{long_prob:.2f}\tshort_prob:{short_prob:.2f}\tidle_prob:{idle_prob:.2f}\t'
+                # average sell/buy price
+                f'avg_bug:{avg_buy}\tavg_sell{avg_sell}'
             )
 
         if (ep + 1) % args.save_interval == 0:
@@ -89,6 +92,7 @@ if __name__ == '__main__':
     """ test """
     for model, model_name in zip(models, model_names):
         profits = [0]
+        avg_buys, avg_sells = [], []
         env = Env(args.test_path)
         observation = env.reset()
         done = False
@@ -97,11 +101,15 @@ if __name__ == '__main__':
         while not done:
             action, _ = model.step([observation])
             observation, reward, done, _ = env.step(int(action))
+            avg_buy, avg_sell = env.get_avg_prices()
             profits.append(profits[-1] + reward)
+            avg_buys.append(avg_buy)
+            avg_sells.append(avg_sell)
             # logger.warn(f'step:{step}\tval_act:{int(action)}\tval_rew:{reward}')
             step += 1
 
-        plt.plot(profits, label=model_name, linewidth=args.linewidth)
+        plt.plot(avg_buys, label=f'buying prices of {model_name}', linewidth=args.linewidth)
+        plt.plot(avg_sells, label=f'selling prices of {model_name}', linewidth=args.linewidth)
 
     plt.legend()
     plt.savefig(os.path.join(folder, 'val.jpg'))
