@@ -29,7 +29,7 @@ class Env(object):
         bst.load_model(args.xgb_path)  # load model
 
         self.pred = bst.predict(xgb.DMatrix(data, label=label))
-        self.pred = label
+        # self.pred = label
         self.day = dataset['Day'].values
         self.price = dataset['midPrice'].values
 

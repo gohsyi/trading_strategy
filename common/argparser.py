@@ -44,7 +44,7 @@ parser.add_argument('-max_position', type=int, default=5)
 # save results
 parser.add_argument('-log_interval', type=int, default=1)
 parser.add_argument('-save_interval', type=int, default=None)
-parser.add_argument('-linewidth', type=float, default=0.5)
+parser.add_argument('-linewidth', type=float, default=0.75)
 parser.add_argument('-smooth', type=float, default=0, help='moving average smooth rate')
 parser.add_argument('-terms', type=str, default='pg_loss;vf_loss;ent_loss;avg_rew,avg_val;'
                                                 'long_prob,short_prob,idle_prob;val_rew')

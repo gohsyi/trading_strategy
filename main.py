@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 if __name__ == '__main__':
     set_global_seeds(args.seed)
 
-    logger = get_logger('a2c')
+    logger = get_logger('trading')
     logger.info(str(args))
 
     env = Env(args.train_path)
