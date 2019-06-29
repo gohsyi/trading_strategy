@@ -47,7 +47,7 @@ class Env(object):
         return self.price[self.tick]
 
     def get_asset(self):
-        return self.cash + self.price * self.position
+        return self.cash + self.get_price() * self.position
 
     def reset(self):
         """
