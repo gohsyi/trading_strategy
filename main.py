@@ -93,6 +93,7 @@ if __name__ == '__main__':
     for model, model_name in zip(models, model_names):
         profits = [0]
         avg_buys, avg_sells = [], []
+        assets = []
         env = Env(args.test_path)
         observation = env.reset()
         done = False
@@ -105,11 +106,13 @@ if __name__ == '__main__':
             profits.append(profits[-1] + reward)
             avg_buys.append(avg_buy)
             avg_sells.append(avg_sell)
+            assets.append(env.get_asset())
             # logger.warn(f'step:{step}\tval_act:{int(action)}\tval_rew:{reward}')
             step += 1
 
-        plt.plot(avg_buys, label=f'buying prices of {model_name}', linewidth=args.linewidth)
-        plt.plot(avg_sells, label=f'selling prices of {model_name}', linewidth=args.linewidth)
+        # plt.plot(avg_buys, label=f'buying prices of {model_name}', linewidth=args.linewidth)
+        # plt.plot(avg_sells, label=f'selling prices of {model_name}', linewidth=args.linewidth)
+        plt.plot(assets, label=f'assets of {model_name}', linewidth=args.linewidth)
 
     plt.legend()
     plt.savefig(os.path.join(folder, 'val.jpg'))

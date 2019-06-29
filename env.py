@@ -38,12 +38,16 @@ class Env(object):
         self.position = 0
         self.avg_bug = []
         self.avg_sell = []
+        self.cash = 0
 
     def get_avg_prices(self):
         return np.mean(self.avg_bug), np.mean(self.avg_sell)
     
     def get_price(self):
         return self.price[self.tick]
+
+    def get_asset(self):
+        return self.cash + self.price * self.position
 
     def reset(self):
         """
@@ -55,6 +59,7 @@ class Env(object):
         self.position = 0
         self.avg_bug = []
         self.avg_sell = []
+        self.cash = 0
         
         return self.x
 
@@ -90,6 +95,8 @@ class Env(object):
             self.avg_sell.append(self.get_price())
         if action == 1:
             self.avg_bug.append(self.get_price())
+
+        self.cash -= action * self.get_price()
 
         # next time-step
         self.tick = (self.tick + 1) % self.n_rows
