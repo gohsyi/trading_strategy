@@ -118,4 +118,6 @@ if __name__ == '__main__':
     plt.savefig(os.path.join(folder, 'val.jpg'))
     plt.cla()
 
+    logger.warn(f'average buying & selling price is {env.get_avg_prices()}')
+
     plot(folder, args.terms, args.smooth, args.linewidth)
