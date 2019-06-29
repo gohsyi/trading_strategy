@@ -58,7 +58,6 @@ if __name__ == '__main__':
             idle_prob = float(np.mean(actions==1))
             long_prob = float(np.mean(actions==2))
             short_prob = float(np.mean(actions==0))
-            avg_buy, avg_sell = env.get_avg_prices()
 
             logger.warn(
                 # epoch number
@@ -69,8 +68,6 @@ if __name__ == '__main__':
                 f'avg_rew:{avg_rewards:.3f}\tavg_val:{avg_values:.3f}\t'
                 # action proportion
                 f'long_prob:{long_prob:.2f}\tshort_prob:{short_prob:.2f}\tidle_prob:{idle_prob:.2f}\t'
-                # average sell/buy price
-                f'avg_bug:{avg_buy}\tavg_sell{avg_sell}'
             )
 
         if (ep + 1) % args.save_interval == 0:
@@ -110,14 +107,18 @@ if __name__ == '__main__':
             # logger.warn(f'step:{step}\tval_act:{int(action)}\tval_rew:{reward}')
             step += 1
 
-        # plt.plot(avg_buys, label=f'buying prices of {model_name}', linewidth=args.linewidth)
-        # plt.plot(avg_sells, label=f'selling prices of {model_name}', linewidth=args.linewidth)
+        avg_buys, buy_prob = env.get_avg_buying()
+        avg_sells, sell_prob = env.get_avg_selling()
+
+        logger.warn(f'model:{model_name}\'\tbuy/sell\t'
+                    f'price:{avg_buys}/{avg_sells}\t'
+                    f'prob:{buy_prob}/{sell_prob}')
+
         plt.plot(assets, label=f'assets of {model_name}', linewidth=args.linewidth)
 
     plt.legend()
     plt.savefig(os.path.join(folder, 'val.jpg'))
     plt.cla()
 
-    logger.warn(f'average buying & selling price is {env.get_avg_prices()}')
 
     plot(folder, args.terms, args.smooth, args.linewidth)

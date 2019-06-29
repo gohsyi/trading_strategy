@@ -40,9 +40,12 @@ class Env(object):
         self.avg_sell = []
         self.cash = 0
 
-    def get_avg_prices(self):
-        return np.mean(self.avg_bug), np.mean(self.avg_sell)
-    
+    def get_avg_buying(self):
+        return np.mean(self.avg_bug), len(self.avg_bug) / self.tick
+
+    def get_avg_selling(self):
+        return np.mean(self.avg_sell), len(self.avg_sell) / self.tick
+
     def get_price(self):
         return self.price[self.tick]
 
