@@ -12,3 +12,19 @@ Besides, attach action selection for each tick on testing set for submission.
 Here are a few typical models and algorithms for reference:
 Deep Direct Reinforcement Learning for Financial Signal Representation and Trading.
 Agent Inspired Trading Using Recurrent Reinforcement Learning and LSTM Neural Networks.
+
+
+## Run
+
+The entry is `main.py`. You can run following command in you terminal.
+
+```
+python main.py \
+-train_path path/to/the/training/data
+-test_path path/to/the/validation/data
+-load_path path/to/the/ckpt/file/you/want/to/finetune/or/test
+-pred_path path/to/the/prediction/results
+-total_epoches {total number of episodes, 0 if you want to test the performance of an existing ckpt}
+```
+
+for more arguments, please refer to `common/argparser.py`.
