@@ -9,10 +9,11 @@ class Env(object):
     Environment
     """
     
-    def __init__(self, data_path):
+    def __init__(self, type='train'):
         self.ob_size = 2  # observation, (price, predicted price 10 time steps after)
         self.act_size = 3  # -1, 0, +1: short position, idle, long position
 
+        data_path = args.train_path if type == 'train' else args.test_path
         dataset = pd.read_csv(data_path)
         self.n_rows = dataset.shape[0]
 
@@ -35,7 +36,7 @@ class Env(object):
 
         elif args.pred_path.endswith('.pt'):
             import torch
-            self.pred = torch.load(args.pred_path)
+            self.pred = np.squeeze(torch.load(args.pred_path)[f'{type}_pred'])
 
         self.day = dataset['Day'].values
         self.price = dataset['midPrice'].values

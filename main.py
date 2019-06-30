@@ -25,7 +25,7 @@ if __name__ == '__main__':
     logger = get_logger('trading')
     logger.info(str(args))
 
-    env = Env(args.train_path)
+    env = Env('train')
 
     # Instantiate the model objects (that creates defender_model and adversary_model)
     model = Model(
@@ -91,7 +91,7 @@ if __name__ == '__main__':
         profits = [0]
         avg_buys, avg_sells = [], []
         assets = []
-        env = Env(args.test_path)
+        env = Env('val')
         observation = env.reset()
         done = False
         step = 0
