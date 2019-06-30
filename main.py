@@ -83,7 +83,7 @@ if __name__ == '__main__':
     model_names = [
         'a2c',
         'stochastic',
-        'rule',
+        'supervised',
     ]
 
     """ test """

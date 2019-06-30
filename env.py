@@ -2,7 +2,6 @@ from common import args
 
 import numpy as np
 import pandas as pd
-import xgboost as xgb
 
 
 class Env(object):
@@ -25,11 +24,19 @@ class Env(object):
         data = dataset[feature]
         label = dataset['label']
 
-        bst = xgb.Booster({'nthread': 4})  # init model
-        bst.load_model(args.xgb_path)  # load model
+        if args.pred_path is None:
+            self.pred = label
 
-        self.pred = bst.predict(xgb.DMatrix(data, label=label))
-        # self.pred = label
+        elif args.pred_path.endswith('.model'):
+            import xgboost as xgb
+            bst = xgb.Booster({'nthread': 4})  # init model
+            bst.load_model(args.xgb_path)  # load model
+            self.pred = bst.predict(xgb.DMatrix(data, label=label))
+
+        elif args.pred_path.endswith('.pt'):
+            import torch
+            self.pred = torch.load(args.pred_path)
+
         self.day = dataset['Day'].values
         self.price = dataset['midPrice'].values
 
